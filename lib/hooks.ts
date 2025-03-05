@@ -51,7 +51,7 @@ export function useUserPastes(userId: string | undefined) {
       const { data, error } = await supabase
         .from("pastes")
         .select("*")
-        .eq("user_id", userId)
+        .eq("id", userId)
         .order("created_at", { ascending: false })
         .limit(10)
 
@@ -76,14 +76,13 @@ export function useCreatePaste() {
       const { data: sessionData } = await supabase.auth.getSession()
       const userId = sessionData.session?.user.id
 
-      // Create slug from title
-      const slug = paste.title
-        .toLowerCase()
-        .replace(/[^\w\s]/g, "")
-        .replace(/\s+/g, "-")
+      if (!userId) {
+        throw new Error("You must be signed in to create a paste")
+      }
 
       // Generate a unique ID if not using Supabase's auto-generated UUIDs
       const id = nanoid(10)
+console.log('generared nano', id);
 
       const { data, error } = await supabase
         .from("pastes")
@@ -91,7 +90,6 @@ export function useCreatePaste() {
           id,
           title: paste.title,
           content: paste.content,
-          slug,
           user_id: userId,
         })
         .select()
@@ -117,6 +115,14 @@ export function useUpdatePaste() {
 
   return useMutation({
     mutationFn: async ({ id, title, content }: { id: string; title: string; content: string }) => {
+      // Get current user
+      const { data: sessionData } = await supabase.auth.getSession()
+      const userId = sessionData.session?.user.id
+
+      if (!userId) {
+        throw new Error("You must be signed in to update a paste")
+      }
+
       // Create updated slug from title
       const slug = title
         .toLowerCase()
@@ -150,6 +156,14 @@ export function useDeletePaste() {
 
   return useMutation({
     mutationFn: async (id: string) => {
+      // Get current user
+      const { data: sessionData } = await supabase.auth.getSession()
+      const userId = sessionData.session?.user.id
+
+      if (!userId) {
+        throw new Error("You must be signed in to delete a paste")
+      }
+
       const { error } = await supabase.from("pastes").delete().eq("id", id)
 
       if (error) {
@@ -187,41 +201,29 @@ export function useUser() {
   })
 }
 
-// Sign in anonymously
-export function useSignInAnonymously() {
+// Sign in with Google
+export function useSignInWithGoogle() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async () => {
-      try {
-        // For anonymous sign-in, we'll use a random email and password
-        const randomEmail = `${nanoid(10)}@anonymous.com`
-        const randomPassword = nanoid(16)
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
 
-        const { data, error } = await supabase.auth.signUp({
-          email: randomEmail,
-          password: randomPassword,
-        })
-
-        if (error) {
-          console.error("Error signing in anonymously:", error)
-          throw error
-        }
-
-        return data.user
-      } catch (error: any) {
-        // If we hit rate limits, provide a more specific error
-        if (error.message?.includes("rate limit")) {
-          throw new Error("Too many sign-in attempts. Please try again later.")
-        }
+      if (error) {
+        console.error("Error signing in with Google:", error)
         throw error
       }
+
+      return data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] })
     },
-    // Limit retries to avoid rate limits
-    retry: false,
   })
 }
 

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, Plus, LogIn } from "lucide-react"
-import { useRecentPastes, useUser, useUserPastes, useSignInAnonymously } from "@/lib/hooks"
+import { useRecentPastes, useUser, useUserPastes, useSignInWithGoogle } from "@/lib/hooks"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
 import { useState } from "react"
@@ -13,22 +13,19 @@ export default function Home() {
   const { data: user, isLoading: isLoadingUser } = useUser()
   const { data: recentPastes = [], isLoading: isLoadingRecent } = useRecentPastes()
   const { data: userPastes = [], isLoading: isLoadingUserPastes } = useUserPastes(user?.id)
-  const signInAnonymously = useSignInAnonymously()
+  const signInWithGoogle = useSignInWithGoogle()
   const [isSigningIn, setIsSigningIn] = useState(false)
-
-  // Remove auto sign-in to avoid rate limits
 
   const handleSignIn = async () => {
     if (isSigningIn) return
 
     setIsSigningIn(true)
     try {
-      await signInAnonymously.mutateAsync()
-      toast.success("Anonymous account created")
+      await signInWithGoogle.mutateAsync()
+      // No need for toast here as we're redirecting to Google
     } catch (error: any) {
       console.error("Error signing in:", error)
-      toast.error(error.message || "Failed to create anonymous account")
-    } finally {
+      toast.error(error.message || "Failed to sign in with Google")
       setIsSigningIn(false)
     }
   }
@@ -41,12 +38,10 @@ export default function Home() {
           <p className="mt-4 text-lg text-muted-foreground">Create and share text content with Markdown support</p>
           {!user && !isLoadingUser && (
             <div className="mt-6">
-              <p className="mb-2 text-sm text-muted-foreground">
-                Create an anonymous account to track and edit your pastes
-              </p>
+              <p className="mb-2 text-sm text-muted-foreground">Sign in with Google to create and edit pastes</p>
               <Button onClick={handleSignIn} disabled={isSigningIn}>
                 <LogIn className="mr-2 h-4 w-4" />
-                {isSigningIn ? "Creating Account..." : "Create Anonymous Account"}
+                {isSigningIn ? "Signing in..." : "Sign in with Google"}
               </Button>
             </div>
           )}
@@ -59,14 +54,18 @@ export default function Home() {
               <CardDescription>Write or paste your content with Markdown support</CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/create">
-                <Button className="w-full" size="lg">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create New Paste
+              {user ? (
+                <Link href="/create">
+                  <Button className="w-full" size="lg">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create New Paste
+                  </Button>
+                </Link>
+              ) : (
+                <Button className="w-full" size="lg" onClick={handleSignIn} disabled={isSigningIn || isLoadingUser}>
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign in to Create
                 </Button>
-              </Link>
-              {!user && (
-                <p className="mt-2 text-xs text-muted-foreground">Note: Create an account to edit your pastes later</p>
               )}
             </CardContent>
           </Card>
@@ -81,7 +80,7 @@ export default function Home() {
                 <li className="flex items-start">
                   <FileText className="mr-2 h-5 w-5 text-primary" />
                   <div>
-                    <strong>No login required</strong> - Create and share content instantly
+                    <strong>Google Authentication</strong> - Secure sign-in to create and edit pastes
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -122,7 +121,7 @@ export default function Home() {
                 <ul className="space-y-2">
                   {recentPastes.map((paste) => (
                     <li key={paste.id} className="border-b pb-2 last:border-0">
-                      <Link href={`/paste/${paste.id}-${paste.slug}`} className="block hover:underline font-medium">
+                      <Link href={`/paste/${paste.id}`} className="block hover:underline font-medium">
                         {paste.title}
                       </Link>
                       <p className="text-xs text-muted-foreground">
@@ -150,7 +149,7 @@ export default function Home() {
                   <ul className="space-y-2">
                     {userPastes.map((paste) => (
                       <li key={paste.id} className="border-b pb-2 last:border-0">
-                        <Link href={`/paste/${paste.id}-${paste.slug}`} className="block hover:underline font-medium">
+                        <Link href={`/paste/${paste.id}`} className="block hover:underline font-medium">
                           {paste.title}
                         </Link>
                         <div className="flex justify-between items-center">

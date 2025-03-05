@@ -1,19 +1,21 @@
 "use client"
 
 import { useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Copy, Edit, ExternalLink } from "lucide-react"
+import { ArrowLeft, Copy, Edit, ExternalLink, LogIn } from "lucide-react"
 import { Markdown } from "@/components/markdown"
-import { usePaste, useUser } from "@/lib/hooks"
+import { usePaste, useUser, useSignInWithGoogle } from "@/lib/hooks"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
 
 export default function PastePage() {
+  const router = useRouter()
   const params = useParams()
   const [copied, setCopied] = useState(false)
+  const [isSigningIn, setIsSigningIn] = useState(false)
 
   // Extract the ID from the slug parameter
   const slugParam = params?.slug as string
@@ -21,6 +23,7 @@ export default function PastePage() {
 
   const { data: paste, isLoading } = usePaste(id)
   const { data: user } = useUser()
+  const signInWithGoogle = useSignInWithGoogle()
 
   // Check if user is the creator
   const isCreator = user?.id && paste?.user_id === user.id
@@ -31,6 +34,20 @@ export default function PastePage() {
       setCopied(true)
       toast.success("Link copied to clipboard")
       setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const handleSignIn = async () => {
+    if (isSigningIn) return
+
+    setIsSigningIn(true)
+    try {
+      await signInWithGoogle.mutateAsync()
+      // No need for toast here as we're redirecting to Google
+    } catch (error: any) {
+      console.error("Error signing in:", error)
+      toast.error(error.message || "Failed to sign in with Google")
+      setIsSigningIn(false)
     }
   }
 
@@ -77,13 +94,18 @@ export default function PastePage() {
                 Created {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
               </CardDescription>
             </div>
-            {isCreator && (
+            {isCreator ? (
               <Link href={`/edit/${paste.id}`}>
                 <Button variant="outline" size="sm">
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </Button>
               </Link>
+            ) : user ? null : (
+              <Button variant="outline" size="sm" onClick={handleSignIn} disabled={isSigningIn}>
+                <LogIn className="h-4 w-4 mr-2" />
+                Sign in
+              </Button>
             )}
           </CardHeader>
           <CardContent>

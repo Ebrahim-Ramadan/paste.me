@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, Save, Trash } from "lucide-react"
+import { ArrowLeft, Save, Trash, LogIn } from "lucide-react"
 import Link from "next/link"
-import { usePaste, useUpdatePaste, useDeletePaste, useUser } from "@/lib/hooks"
+import { usePaste, useUpdatePaste, useDeletePaste, useUser, useSignInWithGoogle } from "@/lib/hooks"
 import { toast } from "sonner"
 import {
   AlertDialog,
@@ -29,13 +29,15 @@ export default function EditPage() {
   const params = useParams()
   const id = params?.id as string
 
-  const { data: user } = useUser()
-  const { data: paste, isLoading } = usePaste(id)
+  const { data: user, isLoading: isLoadingUser } = useUser()
+  const { data: paste, isLoading: isLoadingPaste } = usePaste(id)
   const updatePaste = useUpdatePaste()
   const deletePaste = useDeletePaste()
+  const signInWithGoogle = useSignInWithGoogle()
 
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
+  const [isSigningIn, setIsSigningIn] = useState(false)
 
   useEffect(() => {
     if (paste) {
@@ -49,14 +51,38 @@ export default function EditPage() {
 
   useEffect(() => {
     // If paste is loaded and user is not the creator, redirect
-    if (paste && !isLoading && !isCreator) {
-      toast.error("You don't have permission to edit this paste")
-      router.push(`/paste/${paste.id}-${paste.slug}`)
+    if (paste && !isLoadingPaste && !isLoadingUser) {
+      if (!user) {
+        toast.error("You must be signed in to edit a paste")
+        router.push(`/paste/${paste.id}-${paste.slug}`)
+      } else if (!isCreator) {
+        toast.error("You don't have permission to edit this paste")
+        router.push(`/paste/${paste.id}-${paste.slug}`)
+      }
     }
-  }, [paste, isLoading, isCreator, router])
+  }, [paste, isLoadingPaste, isLoadingUser, isCreator, router, user])
+
+  const handleSignIn = async () => {
+    if (isSigningIn) return
+
+    setIsSigningIn(true)
+    try {
+      await signInWithGoogle.mutateAsync()
+      // No need for toast here as we're redirecting to Google
+    } catch (error: any) {
+      console.error("Error signing in:", error)
+      toast.error(error.message || "Failed to sign in with Google")
+      setIsSigningIn(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!user) {
+      toast.error("You must be signed in to update a paste")
+      return
+    }
 
     if (!title.trim() || !content.trim()) {
       toast.error("Please fill in all fields")
@@ -79,6 +105,11 @@ export default function EditPage() {
   }
 
   const handleDelete = async () => {
+    if (!user) {
+      toast.error("You must be signed in to delete a paste")
+      return
+    }
+
     try {
       await deletePaste.mutateAsync(id)
       toast.success("Paste deleted successfully!")
@@ -89,7 +120,37 @@ export default function EditPage() {
     }
   }
 
-  if (isLoading) {
+  // If not signed in, show sign in prompt
+  if (!user && !isLoadingUser) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-3xl mx-auto">
+          <Link href="/" className="inline-flex items-center mb-6 text-sm font-medium text-primary">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to home
+          </Link>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Sign in Required</CardTitle>
+              <CardDescription>You need to sign in with Google to edit pastes</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center py-8">
+              <p className="mb-6 text-center text-muted-foreground">
+                To edit and manage your pastes, please sign in with your Google account.
+              </p>
+              <Button onClick={handleSignIn} disabled={isSigningIn}>
+                <LogIn className="mr-2 h-4 w-4" />
+                {isSigningIn ? "Signing in..." : "Sign in with Google"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
+  if (isLoadingPaste || isLoadingUser) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto text-center">
