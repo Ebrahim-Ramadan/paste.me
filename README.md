@@ -1,10 +1,10 @@
 # Paste.md
 
-Welcome to [Paste.md]()! 👋
+Welcome to [Paste.md](https://pastedotme.vercel.app/)! 👋
 
 ## What is Paste.md?
 
-Paste.md is a simple, free, and open-source tool that helps you share text content easily. Think of it as a friendly notepad that lives on the internet!
+Paste.md is a simple, free, and open-source tool that helps you share any content easily. Think of it as a friendly notepad that lives on the internet!
 
 ## Features
 
