@@ -9,12 +9,20 @@ interface MarkdownProps {
   content: string
 }
 
+interface CodeProps {
+  node?: any
+  inline?: boolean
+  className?: string
+  children?: React.ReactNode
+  [key: string]: any
+}
+
 export function Markdown({ content }: MarkdownProps) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
-        code({ node, inline, className, children, ...props }) {
+        code({ node, inline, className, children, ...props }: CodeProps) {
           const match = /language-(\w+)/.exec(className || "")
           return !inline && match ? (
             <SyntaxHighlighter style={vscDarkPlus} language={match[1]} PreTag="div" {...props}>
@@ -53,4 +61,3 @@ export function Markdown({ content }: MarkdownProps) {
     </ReactMarkdown>
   )
 }
-
