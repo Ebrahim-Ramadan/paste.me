@@ -10,7 +10,7 @@ import Link from "next/link"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "JustPaste Clone - Free Markdown Sharing",
+  title: "Paste.Me - Free Markdown Sharing",
   description: "Create and share text content with Markdown support",
 }
 
@@ -26,7 +26,7 @@ export default function RootLayout({
           <header className="border-b">
             <div className="container mx-auto px-4 py-3 flex justify-between items-center">
               <Link href="/" className="font-bold text-xl">
-                JustPaste Clone
+                Paste.Me
               </Link>
               <UserMenu />
             </div>
@@ -34,7 +34,7 @@ export default function RootLayout({
           <main className="min-h-screen bg-background">{children}</main>
           <footer className="py-6 border-t">
             <div className="container text-center text-sm text-muted-foreground">
-              <p>JustPaste Clone - Free Markdown Sharing Service</p>
+              <p>Paste.Me - created by <a target="_blank" className="text-neutral-700 font-medium hover:underline" href="https://ebrahim-ramadan.vercel.app/">Ebrahim Ramadan</a></p>
             </div>
           </footer>
           <Toaster position="top-right" />

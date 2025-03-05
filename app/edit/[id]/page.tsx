@@ -54,10 +54,10 @@ export default function EditPage() {
     if (paste && !isLoadingPaste && !isLoadingUser) {
       if (!user) {
         toast.error("You must be signed in to edit a paste")
-        router.push(`/paste/${paste.id}-${paste.slug}`)
+        router.push(`/paste/${paste.id}`)
       } else if (!isCreator) {
         toast.error("You don't have permission to edit this paste")
-        router.push(`/paste/${paste.id}-${paste.slug}`)
+        router.push(`/paste/${paste.id}`)
       }
     }
   }, [paste, isLoadingPaste, isLoadingUser, isCreator, router, user])
@@ -97,7 +97,7 @@ export default function EditPage() {
       })
 
       toast.success("Paste updated successfully!")
-      router.push(`/paste/${updatedPaste.id}-${updatedPaste.slug}`)
+      router.push(`/paste/${updatedPaste.id}`)
     } catch (error) {
       console.error("Error updating paste:", error)
       toast.error("Failed to update paste")
@@ -181,7 +181,7 @@ export default function EditPage() {
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-3xl mx-auto">
         <Link
-          href={`/paste/${paste.id}-${paste.slug}`}
+          href={`/paste/${paste.id}`}
           className="inline-flex items-center mb-6 text-sm font-medium text-primary"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />

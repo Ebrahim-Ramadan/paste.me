@@ -10,9 +10,9 @@ import { Markdown } from "@/components/markdown"
 import { usePaste, useUser, useSignInWithGoogle } from "@/lib/hooks"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
+import LoadingDots from "@/components/LoadingDots"
 
 export default function PastePage() {
-  const router = useRouter()
   const params = useParams()
   const [copied, setCopied] = useState(false)
   const [isSigningIn, setIsSigningIn] = useState(false)
@@ -53,11 +53,9 @@ export default function PastePage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto text-center">
-          <p>Loading...</p>
-        </div>
-      </div>
+      <div className="min-h-screen flex items-center justify-center w-full">
+      <LoadingDots/>
+    </div>
     )
   }
 

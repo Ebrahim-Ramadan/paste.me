@@ -1,6 +1,7 @@
 "use client"
 import { useParams } from "next/navigation"
 import { usePaste } from "@/lib/hooks"
+import LoadingDots from "@/components/LoadingDots"
 
 export default function RawPage() {
   const params = useParams()
@@ -9,7 +10,9 @@ export default function RawPage() {
   const { data: paste, isLoading } = usePaste(id)
 
   if (isLoading) {
-    return <p className="p-4">Loading...</p>
+    return  <div className="min-h-screen flex items-center justify-center w-full">
+    <LoadingDots/>
+  </div>
   }
 
   if (!paste) {

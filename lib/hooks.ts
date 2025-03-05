@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase, type Paste } from "./supabase"
-import { nanoid } from "nanoid"
 
 // Get a single paste by ID
 export function usePaste(id: string | undefined) {
@@ -51,9 +50,9 @@ export function useUserPastes(userId: string | undefined) {
       const { data, error } = await supabase
         .from("pastes")
         .select("*")
-        .eq("id", userId)
+        .eq("user_id", userId)
         .order("created_at", { ascending: false })
-        .limit(10)
+        .limit(5)
 
       if (error) {
         console.error("Error fetching user pastes:", error)
@@ -81,8 +80,7 @@ export function useCreatePaste() {
       }
 
       // Generate a unique ID if not using Supabase's auto-generated UUIDs
-      const id = nanoid(10)
-console.log('generared nano', id);
+      const id = Date.now();
 
       const { data, error } = await supabase
         .from("pastes")
