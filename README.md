@@ -6,6 +6,14 @@ Welcome to [Paste.md](https://pastedotme.vercel.app/)! 👋
 
 Paste.md is a simple, free, and open-source tool that helps you share any content easily. Think of it as a friendly notepad that lives on the internet!
 
+## Tech Stack
+
+- **Frontend**: Next.js fullstack framework
+- **Styling**: Tailwind CSS & Shadcn for responsive design
+- **Database**: Supabase for content storage
+- **Deployment**: Vercel for seamless continuous deployment
+- **Version Control**: Git & GitHub
+
 ## Features
 
 - **100% Free**: No hidden costs, no premium plans - just a helpful tool for everyone.
