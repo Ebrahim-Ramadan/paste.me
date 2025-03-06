@@ -216,6 +216,7 @@ export function useSignInWithGoogle() {
   return useMutation({
     mutationFn: async () => {
       const siteUrl = typeof window !== "undefined" ? window.location.origin : getSiteUrl()
+console.log('siteUrl', siteUrl)
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
