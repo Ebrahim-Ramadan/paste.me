@@ -89,12 +89,12 @@ export default function PastePage() {
               </CardDescription>
             </div>
             {isCreator ? (
-              <Link href={`/edit/${paste.id}`}>
+              <a href={`/edit/${paste.id}`}>
                 <Button variant="outline" size="sm">
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </Button>
-              </Link>
+              </a>
             ) : user ? null : (
               <Button variant="outline" size="sm" onClick={handleSignIn} disabled={isSigningIn}>
                 <LogIn className="h-4 w-4 mr-2" />
