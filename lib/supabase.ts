@@ -19,7 +19,7 @@ export interface Paste {
 export function getSiteUrl() {
   let url =
     process?.env?.NEXT_PUBLIC_BASE_URL ?? // Set this in your .env file
-    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel
+    // process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel
     "http://localhost:3000"
 
   // Make sure to include `https://` when not localhost

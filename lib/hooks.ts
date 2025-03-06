@@ -27,6 +27,9 @@ export function usePaste(id: string | undefined) {
       return data as Paste
     },
     enabled: !!id,
+    refetchOnMount: 'always', // Force refetch every time the component mounts
+    staleTime: 0,             // Mark data as stale immediately to trigger refetch
+    // cacheTime: 0,
   })
 }
 
@@ -132,15 +135,10 @@ export function useUpdatePaste() {
         throw new Error("You must be signed in to update a paste")
       }
 
-      // Create updated slug from title
-      const slug = title
-        .toLowerCase()
-        .replace(/[^\w\s]/g, "")
-        .replace(/\s+/g, "-")
 
       const { data, error } = await supabase
         .from("pastes")
-        .update({ title, content, slug })
+        .update({ title, content })
         .eq("id", id)
         .select()
         .single()

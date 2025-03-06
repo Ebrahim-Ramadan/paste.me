@@ -17,7 +17,6 @@ export default function PastePage() {
   const [copied, setCopied] = useState(false)
   const [isSigningIn, setIsSigningIn] = useState(false)
 
-  // Extract the ID from the slug parameter
   const slugParam = params?.slug as string
   const id = slugParam?.split("-")[0]
 
@@ -25,7 +24,6 @@ export default function PastePage() {
   const { data: user } = useUser()
   const signInWithGoogle = useSignInWithGoogle()
 
-  // Check if user is the creator
   const isCreator = user?.id && paste?.user_id === user.id
 
   const copyToClipboard = () => {
@@ -39,11 +37,9 @@ export default function PastePage() {
 
   const handleSignIn = async () => {
     if (isSigningIn) return
-
     setIsSigningIn(true)
     try {
       await signInWithGoogle.mutateAsync()
-      // No need for toast here as we're redirecting to Google
     } catch (error: any) {
       console.error("Error signing in:", error)
       toast.error(error.message || "Failed to sign in with Google")
@@ -54,8 +50,8 @@ export default function PastePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center w-full">
-      <LoadingDots/>
-    </div>
+        <LoadingDots />
+      </div>
     )
   }
 
@@ -128,4 +124,3 @@ export default function PastePage() {
     </div>
   )
 }
-
