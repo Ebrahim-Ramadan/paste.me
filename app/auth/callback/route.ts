@@ -12,9 +12,8 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // Determine the base URL based on the environment (tryna fix the localhost redirect in prod issue)
-  const baseUrl = process.env.BASE_URL || requestUrl.origin
-
   // URL to redirect to after sign in process completes
-  return NextResponse.redirect(baseUrl)
+  // Use the origin from the request URL to ensure it works in all environments
+  return NextResponse.redirect(requestUrl.origin)
 }
+

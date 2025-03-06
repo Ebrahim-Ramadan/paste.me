@@ -1,6 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase, type Paste } from "./supabase"
 
+const getSiteUrl = () => {
+  if (typeof window !== "undefined") {
+    return window.location.origin
+  }
+
+  // Provide a default URL for server-side rendering or other environments
+  return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+}
+
+
 // Get a single paste by ID
 export function usePaste(id: string | undefined) {
   return useQuery({
@@ -205,10 +215,12 @@ export function useSignInWithGoogle() {
 
   return useMutation({
     mutationFn: async () => {
+      const siteUrl = typeof window !== "undefined" ? window.location.origin : getSiteUrl()
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`
+          redirectTo: `${siteUrl}/auth/callback`
         },
       })
 
