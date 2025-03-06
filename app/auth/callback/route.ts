@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Determine the base URL based on the environment (tryna fix the localhost redirect in prod issue)
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || requestUrl.origin
+  const baseUrl = process.env.BASE_URL || requestUrl.origin
 
   // URL to redirect to after sign in process completes
   return NextResponse.redirect(baseUrl)
