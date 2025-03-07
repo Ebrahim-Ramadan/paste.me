@@ -83,7 +83,7 @@ export function useCreatePaste() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (paste: { title: string; content: string }) => {
+    mutationFn: async (paste: { id?: string; title: string; content: string }) => {
       // Get current user
       const { data: sessionData } = await supabase.auth.getSession()
       const userId = sessionData.session?.user.id
@@ -92,8 +92,8 @@ export function useCreatePaste() {
         throw new Error("You must be signed in to create a paste")
       }
 
-      // Generate a unique ID if not using Supabase's auto-generated UUIDs
-      const id = Date.now();
+       // Use provided id or generate a unique one
+      const id = paste.id || `${Date.now()}`;
 
       const { data, error } = await supabase
         .from("pastes")
@@ -192,7 +192,8 @@ export function useUser() {
     queryKey: ["user"],
     queryFn: async () => {
       const { data, error } = await supabase.auth.getSession()
-
+      console.log('data', data);
+      
       if (error) {
         console.error("Error getting session:", error)
         return null
