@@ -72,14 +72,17 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+      <Button
+            variant="ghost"
+            className="h-8 w-8 rounded-full p-0 focus:ring-0 focus:ring-offset-0"
+          >
           <Avatar className="h-8 w-8">
             <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name || "User"} />
             <AvatarFallback>{getInitials()}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-56" align="end" forceMount >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || "User"}</p>
@@ -89,7 +92,7 @@ export function UserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <button
-            className="w-full flex items-center cursor-default text-sm px-2 py-1.5 rounded-sm"
+            className="cursor-pointer w-full flex items-center cursor-default text-sm px-2 py-1.5 rounded-sm"
             onClick={handleSignOut}
           >
             <LogOut className="mr-2 h-4 w-4" />

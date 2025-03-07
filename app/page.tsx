@@ -7,8 +7,9 @@ import {  Plus, LogIn, Edit } from "lucide-react"
 import {  useUser, useUserPastes, useSignInWithGoogle } from "@/lib/hooks"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import Image from "next/image"
+import LoadingDots from "@/components/LoadingDots"
 
 export default function Home() {
   const { data: user, isLoading: isLoadingUser } = useUser()
@@ -93,7 +94,8 @@ export default function Home() {
                 ) : userPastes.length === 0 ? (
                   <p className="text-muted-foreground">You haven't created any pastes yet</p>
                 ) : (
-                  <ul className="space-y-2">
+                  <Suspense fallback={<LoadingDots />}>
+                    <ul className="space-y-2">
                     {userPastes.map((paste) => (
                       <a key={paste.id} href={`/paste/${paste.id}`} className="group  border-b pb-2 last:border-0 hover:bg-blue-200">
                         <p  className="block group-hover:underline font-medium">
@@ -111,6 +113,7 @@ export default function Home() {
                       </a>
                     ))}
                   </ul>
+                  </Suspense>
                 )}
               </CardContent>
             </Card>

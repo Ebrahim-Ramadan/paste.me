@@ -83,6 +83,25 @@ export default function EditPage() {
     }
   }, [paste, isLoadingPaste, isLoadingUser, isCreator, router, user]);
 
+// Replace the problematic useEffect with this:
+useEffect(() => {
+  const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    // Only show confirmation if there are unsaved changes
+    if (paste && (title !== paste.title || content !== paste.content)) {
+      event.preventDefault();
+      // Most browsers ignore custom messages and show their own
+      event.returnValue = 'Are you sure you want to leave? Changes you made may not be saved.';
+      return 'Are you sure you want to leave? Changes you made may not be saved.';
+    }
+  };
+
+  window.addEventListener('beforeunload', handleBeforeUnload);
+  
+  return () => {
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+  };
+}, [paste, title, content]); // Add dependencies to check for unsaved changes
+
   const handleSignIn = async () => {
     if (isSigningIn) return;
 
@@ -328,10 +347,31 @@ export default function EditPage() {
     );
   }
 
+
+
+   // Function to show the alert
+   const showAlert = () => {
+    const confirmNavigation = window.confirm('Are you sure you want to leave?');
+    if (!confirmNavigation) {
+      return false; // Prevent navigation
+    }
+    return true; // Allow navigation
+  };
+
+  const handleGoingBackAler = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    // Only show alert if there are unsaved changes
+    if (paste && (title !== paste.title || content !== paste.content)) {
+      if (!showAlert()) {
+        e.preventDefault(); // Prevent navigation if user cancels
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-3xl mx-auto">
         <Link
+        onClick={handleGoingBackAler}
           href={`/paste/${paste.id}`}
           className="inline-flex items-center mb-6 text-sm font-medium text-primary"
         >
