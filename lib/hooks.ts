@@ -87,7 +87,6 @@ export function useCreatePaste() {
       // Get current user
       const { data: sessionData } = await supabase.auth.getSession()
       const userId = sessionData.session?.user.id
-      console.log('userId', userId)
       
       if (!userId) {
         throw new Error("You must be signed in to create a paste")

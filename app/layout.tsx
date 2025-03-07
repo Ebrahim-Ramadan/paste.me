@@ -6,7 +6,6 @@ import Providers from "./providers"
 import { Toaster } from "sonner"
 import { UserMenu } from "@/components/user-menu"
 import Link from "next/link"
-import { Github } from "lucide-react"
 
 const inter = Inter({ subsets: ["latin"] })
 
