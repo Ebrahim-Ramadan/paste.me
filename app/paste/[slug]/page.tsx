@@ -93,9 +93,11 @@ export default function PastePage() {
         <Card>
           <CardHeader className="flex flex-row items-start justify-between">
             <div>
-              <CardTitle>{paste.title}</CardTitle>
-              <CardDescription>
-                Created {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
+              <CardTitle className="leading-7">
+              {paste.title.length > 80 ? `${paste.title.slice(0, 80)}...` : paste.title}
+              </CardTitle>
+              <CardDescription className="text-neutral-600">
+                created {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
               </CardDescription>
             </div>
             {isCreator ? (

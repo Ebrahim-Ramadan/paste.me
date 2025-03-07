@@ -105,8 +105,8 @@ export default function Home() {
           className="group hover:bg-neutral-50 p-2 block"
         >
           
-          <p className="leading-[1.5] group-hover:underline normal-case font-medium hidden md:block">
-          {paste.title.length > 100 ? `${paste.title.slice(0, 100)}...` : paste.title}
+          <p className="leading-[1.4] group-hover:underline normal-case font-medium hidden md:block">
+          {paste.title.length > 80 ? `${paste.title.slice(0, 80)}...` : paste.title}
           </p>
           <p className="leading-[1.2] group-hover:underline normal-case font-medium block md:hidden">
           {paste.title.length > 30 ? `${paste.title.slice(0, 30)}...` : paste.title}
