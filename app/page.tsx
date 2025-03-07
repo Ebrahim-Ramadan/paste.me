@@ -8,6 +8,7 @@ import {  useUser, useUserPastes, useSignInWithGoogle } from "@/lib/hooks"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
 import { useState } from "react"
+import Image from "next/image"
 
 export default function Home() {
   const { data: user, isLoading: isLoadingUser } = useUser()
@@ -31,8 +32,10 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-4xl mx-auto">
+    <div className=" mx-auto px-4 py-12"
+    >
+      <div className="absolute inset-0 bg-custom-image bg-cover bg-center opacity-20 z-[-1] filter blur-custom"></div>
+      <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center mb-12">
           {!user && !isLoadingUser && (
             <div className="mt-6">
@@ -44,8 +47,16 @@ export default function Home() {
             </div>
           )}
         </div>
-
-          <Card>
+        <div className="w-full flex justify-center py-4 md:py-12">
+            <Image
+            src={"/logo.svg"}
+            alt="Logo"  
+            width={120}
+            height={120}
+            />
+            </div>
+          <Card >
+           
             <CardHeader>
               <CardTitle>Create a new paste</CardTitle>
               <CardDescription>Write or paste your content with Markdown support</CardDescription>

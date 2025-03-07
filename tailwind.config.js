@@ -16,6 +16,12 @@ module.exports = {
       },
     },
     extend: {
+      blur: {
+        'custom': '10px',
+      },
+      backgroundImage: {
+        'custom-image': "url('/globe-outline-dark-2.svg')",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

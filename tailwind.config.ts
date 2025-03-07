@@ -12,6 +12,12 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      backgroundImage: {
+        'custom-image': "url('/globe-outline-dark-2.svg')",
+      },
+      blur: {
+        'custom': '10px',
+      }
     },
   },
   plugins: [],

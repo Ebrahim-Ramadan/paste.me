@@ -69,7 +69,7 @@ export default function RootLayout({
               <UserMenu />
             </div>
           </header>
-          <main className="min-h-screen bg-background">{children}</main>
+          <main className="min-h-screen">{children}</main>
           <footer className="py-6 border-t">
             <div className="flex flex-row items-center gap-2 justify-center text-neutral-700 font-medium hover:[&>*]:underline text-center text-sm ">
               <a target="_blank" className="flex flex-row items-center mr-2 " href="https://github.com/Ebrahim-Ramadan/paste.me">Paste.Me -
