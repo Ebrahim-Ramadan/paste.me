@@ -19,6 +19,10 @@ interface CodeProps {
 }
 
 export function Markdown({ content }: MarkdownProps) {
+  const processedContent = content
+    .replace(/<br\s*\/?>/gi, "\n") // Replace <br> or <br/> (case-insensitive) with \n
+    .replace(/&nbsp;/g, " "); // Optional: Replace &nbsp; with a space if needed
+
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -112,7 +116,7 @@ export function Markdown({ content }: MarkdownProps) {
         ),
       }}
     >
-      {content}
+      {processedContent}
     </ReactMarkdown>
   );
 }

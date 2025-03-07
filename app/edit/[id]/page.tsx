@@ -466,6 +466,7 @@ export default function EditPage() {
                   id="title"
                   placeholder="Enter a title for your paste"
                   value={title}
+                  autoFocus
                   onChange={(e) => setTitle(e.target.value)}
                   required
                 />

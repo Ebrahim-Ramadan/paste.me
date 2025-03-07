@@ -13,24 +13,28 @@ const getSiteUrl = () => {
 
 // Get a single paste by ID
 export function usePaste(id: string | undefined) {
-  return useQuery({
+  return useQuery<Paste | null>({
     queryKey: ["paste", id],
     queryFn: async () => {
-      if (!id) return null
-      const { data, error } = await supabase.from("pastes").select("*").eq("id", id).single()
+      if (!id) return null;
+
+      const { data, error } = await supabase
+        .from("pastes")
+        .select("*")
+        .eq("id", id)
+        .single();
 
       if (error) {
-        console.error("Error fetching paste:", error)
-        return null
+        console.error("Error fetching paste:", error);
+        return null;
       }
 
-      return data as Paste
+      return data as Paste;
     },
-    enabled: !!id,
-    refetchOnMount: 'always', // Force refetch every time the component mounts
-    staleTime: 0,             // Mark data as stale immediately to trigger refetch
-    // cacheTime: 0,
-  })
+    enabled: !!id, // Only run query if id is defined
+    refetchOnMount: "always", // Force refetch every time the component mounts
+    staleTime: 0, // Mark data as stale immediately to trigger refetch
+  });
 }
 
 // Get recent pastes

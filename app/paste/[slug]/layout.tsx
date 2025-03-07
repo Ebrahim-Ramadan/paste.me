@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: paste, error } = await supabase
     .from("pastes")
-    .select("*")
+    .select("title, created_at")
     .eq("id", id)
     .single()
 
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const baseUrl = process.env.BASE_URL || 'https://pastedotme.vercel.app'
   const title = paste.title || 'New Paste'
-  const description = paste.content.substring(0, 160) || 'A paste created with our service'
+  const description = paste.title || 'A paste created with our service'
   const url = `${baseUrl}/paste/${slugParam}`
   const created = paste.created_at
     ? new Date(paste.created_at).toLocaleDateString()

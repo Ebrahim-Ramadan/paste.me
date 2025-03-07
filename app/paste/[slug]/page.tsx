@@ -1,71 +1,75 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Copy, Edit, ExternalLink, LogIn } from "lucide-react"
-import { Markdown } from "@/components/markdown"
-import { usePaste, useUser, useSignInWithGoogle } from "@/lib/hooks"
-import { formatDistanceToNow } from "date-fns"
-import { toast } from "sonner"
-import LoadingDots from "@/components/LoadingDots"
+import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Copy, Edit, ExternalLink, LogIn } from "lucide-react";
+import { Markdown } from "@/components/markdown";
+import { usePaste, useUser, useSignInWithGoogle } from "@/lib/hooks";
+import { formatDistanceToNow } from "date-fns";
+import { toast } from "sonner";
+import LoadingDots from "@/components/LoadingDots";
+
 
 export default function PastePage() {
-  const params = useParams()
-  const [contentcopied, setcontentCopied] = useState(false)
-  const [linkcopied, setlinkCopied] = useState(false)
-  const [isSigningIn, setIsSigningIn] = useState(false)
+  const params = useParams();
+  const [contentCopied, setContentCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
-  const slugParam = params?.slug as string
-  const id = slugParam?.split("-")[0]
+  const slugParam = params?.slug as string;
+  const id = slugParam?.split("-")[0];
 
-  const { data: paste, isLoading } = usePaste(id)
-  const { data: user } = useUser()
-  const signInWithGoogle = useSignInWithGoogle()
+  const { data: paste, isLoading, error } = usePaste(id);
+  const { data: user } = useUser();
+  const signInWithGoogle = useSignInWithGoogle();
 
-  const isCreator = user?.id && paste?.user_id === user.id
+  console.log("paste data:", paste);
+
+  const isCreator = user?.id && paste?.user_id === user.id;
 
   const copyToClipboard = (type: "link" | "content") => () => {
     if (typeof window !== "undefined") {
       if (type === "link") {
-        navigator.clipboard.writeText(window.location.href)
-        setlinkCopied(true)
-      setTimeout(() => setlinkCopied(false), 2000)
-
+        navigator.clipboard.writeText(window.location.href);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+      } else if (paste?.content) { // Check if paste.content exists
+        navigator.clipboard.writeText(paste.content);
+        setContentCopied(true);
+        setTimeout(() => setContentCopied(false), 2000);
+      } else {
+        toast.error("No content to copy");
       }
-      else {
-        // @ts-ignore
-        navigator.clipboard.writeText(paste.content)
-        setcontentCopied(true)
-        setTimeout(() => setcontentCopied(false), 2000)
-      }
-      toast.success(`${type} copied to clipboard`)
+      toast.success(`${type} copied to clipboard`);
     }
-  }
+  };
 
+  
   const handleSignIn = async () => {
-    if (isSigningIn) return
-    setIsSigningIn(true)
+    if (isSigningIn) return;
+    setIsSigningIn(true);
     try {
-      await signInWithGoogle.mutateAsync()
+      await signInWithGoogle.mutateAsync();
     } catch (error: any) {
-      console.error("Error signing in:", error)
-      toast.error(error.message || "Failed to sign in with Google")
-      setIsSigningIn(false)
+      console.error("Error signing in:", error);
+      toast.error(error.message || "Failed to sign in with Google");
+      setIsSigningIn(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center w-full">
         <LoadingDots />
       </div>
-    )
+    );
   }
 
-  if (!paste) {
+  if (error || !paste) {
+    console.log("Error or paste not found:", error);
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto text-center">
@@ -79,7 +83,7 @@ export default function PastePage() {
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -94,7 +98,7 @@ export default function PastePage() {
           <CardHeader className="flex flex-row items-start justify-between">
             <div>
               <CardTitle className="leading-7">
-              {paste.title.length > 80 ? `${paste.title.slice(0, 80)}...` : paste.title}
+                {paste.title.length > 80 ? `${paste.title.slice(0, 80)}...` : paste.title}
               </CardTitle>
               <CardDescription className="text-neutral-600">
                 created {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
@@ -121,14 +125,14 @@ export default function PastePage() {
           </CardContent>
           <CardFooter className="flex justify-between md:flex-row flex-col gap-2">
             <div className="flex md:flex-row flex-col gap-2">
-            <Button variant="outline" onClick={copyToClipboard('link')} disabled={isLoading}>
-              <Copy className="mr-2 h-4 w-4" />
-              {linkcopied ? "Copied!" : "Copy link"}
-            </Button>
-            <Button variant="outline" onClick={copyToClipboard('content')}>
-              <Copy className="mr-2 h-4 w-4" />
-              {contentcopied ? "Copied!" : "Copy Content"}
-            </Button>
+              <Button variant="outline" onClick={copyToClipboard("link")} disabled={isLoading}>
+                <Copy className="mr-2 h-4 w-4" />
+                {linkCopied ? "Copied!" : "Copy link"}
+              </Button>
+              <Button variant="outline" onClick={copyToClipboard("content")} disabled={!paste.content || isLoading}>
+                <Copy className="mr-2 h-4 w-4" />
+                {contentCopied ? "Copied!" : "Copy Content"}
+              </Button>
             </div>
             <Button variant="outline" asChild>
               <a href={`/raw/${paste.id}`} target="_blank" rel="noopener noreferrer">
@@ -140,5 +144,5 @@ export default function PastePage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

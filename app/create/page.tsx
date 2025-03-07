@@ -300,6 +300,7 @@ export default function CreatePage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
+                  autoFocus
                 />
               </div>
               <div className="space-y-2 relative">

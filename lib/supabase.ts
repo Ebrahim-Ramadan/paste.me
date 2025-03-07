@@ -12,7 +12,7 @@ export interface Paste {
   title: string
   content: string
   created_at: string
-  user_id?: string
+  user_id: string
 }
 
 // Helper function to get the site URL
