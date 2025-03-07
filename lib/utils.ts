@@ -7,21 +7,20 @@ export function cn(...inputs: ClassValue[]) {
 
 
 
-// Function to extract image filenames from markdown
-export function extractImageFilenames(markdownContent: string): string[] {
-  const regex = /!\[.*?\]\((.*?)\)/g;  // Matches Markdown image syntax
+export function extractImageFilenames(content: string): string[] {
+  const markdownImageRegex = /!\[.*?\]\((.*?)\)/g;
   const filenames: string[] = [];
   let match;
 
-  while ((match = regex.exec(markdownContent)) !== null) {
-      try {
-          const url = new URL(match[1]); // Parse the URL
-          const pathname = url.pathname;  // Get the path
-          const filename = pathname.substring(pathname.lastIndexOf('/') + 1); // Extract the filename
-          filenames.push(filename);
-      } catch (error) {
-          console.warn(`Invalid URL found in markdown: ${match[1]}`);
-      }
+  while ((match = markdownImageRegex.exec(content)) !== null) {
+    const url = match[1]; // e.g., "https://zrhpfgbzjlouqoyuywflg.supabase.co/storage/v1/object/public/pastes-storage/1741352140777-Screenshot%202025-03-04%20195117.png"
+    const filenameWithEncoding = url.split("/").pop(); // Extracts "1741352140777-Screenshot%202025-03-04%20195117.png"
+    if (filenameWithEncoding) {
+      const filename = decodeURIComponent(filenameWithEncoding); // Decode to "1741352140777-Screenshot 2025-03-04 195117.png"
+      filenames.push(filename);
+    }
   }
+
+  console.log("Extracted filenames:", filenames);
   return filenames;
 }

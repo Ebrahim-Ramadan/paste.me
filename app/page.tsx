@@ -54,6 +54,7 @@ export default function Home() {
             alt="Logo"  
             width={120}
             height={120}
+            quality={50}
             />
             </div>
           <Card >
