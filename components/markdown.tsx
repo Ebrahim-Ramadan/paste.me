@@ -41,15 +41,25 @@ export function Markdown({ content }: MarkdownProps) {
             </code>
           );
         },
-        // Custom paragraph component to handle newlines and indentations
         p: ({ node, children, ...props }) => {
+          const modifiedChildren = React.Children.toArray(children).flatMap(
+            (child, index, array) => {
+              if (typeof child === "string") {
+                const parts = child.split("\n");
+                return parts.map((part, partIndex) => (
+                  <React.Fragment key={`${index}-${partIndex}`}>
+                    {part}
+                    {partIndex < parts.length - 1 && <br />}
+                  </React.Fragment>
+                ));
+              }
+              return child;
+            }
+          );
+
           return (
             <p className="mb-4" {...props}>
-              {React.Children.map(children, (child, index) => {
-                return React.isValidElement(child)
-                  ? child
-                  : String(child); // Ensure it's rendered as a string if not an element
-              })}
+              {modifiedChildren}
             </p>
           );
         },
