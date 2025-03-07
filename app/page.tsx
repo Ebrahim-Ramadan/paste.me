@@ -3,8 +3,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {  Plus, LogIn, Edit } from "lucide-react"
-import {  useUser, useUserPastes, useSignInWithGoogle } from "@/lib/hooks"
+import {  Plus, LogIn, Edit, Delete, Trash, Trash2 } from "lucide-react"
+import {  useUser, useUserPastes, useSignInWithGoogle, useDeletePaste } from "@/lib/hooks"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
 import { Suspense, useState } from "react"
@@ -16,6 +16,8 @@ export default function Home() {
   // const { data: recentPastes = [], isLoading: isLoadingRecent } = useRecentPastes()
   const { data: userPastes = [], isLoading: isLoadingUserPastes } = useUserPastes(user?.id)
   const signInWithGoogle = useSignInWithGoogle()
+    const deletePaste = useDeletePaste();
+  
   const [isSigningIn, setIsSigningIn] = useState(false)
 
   const handleSignIn = async () => {
@@ -31,6 +33,21 @@ export default function Home() {
       setIsSigningIn(false)
     }
   }
+   const handleDelete = async (id: string) => {
+      if (!user) {
+        toast.error("You must be signed in to delete a paste");
+        return;
+      }
+  
+      try {
+        await deletePaste.mutateAsync(id);
+        toast.success("Paste deleted successfully!");
+        
+      } catch (error) {
+        console.error("Error deleting paste:", error);
+        toast.error("Failed to delete paste");
+      }
+    };
 
   return (
     <div className=" mx-auto px-4 py-12"
@@ -116,13 +133,19 @@ export default function Home() {
             {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
           </p>
         </a>
+        <div className="pl-4 flex flex-row items-center gap-2">
         <a
           href={`/edit/${paste.id}`}
-          className="text-xs text-primary gap-2 hover:underline flex items-center flex-row pl-4"
+          className=" "
         >
           <Edit size="16" />
-          Edit
         </a>
+        <button
+          onClick={() => handleDelete(paste.id)}
+        >
+          <Trash2 color="red"  size="16" />
+        </button>
+        </div>
       </li>
     ))}
 </Suspense>
