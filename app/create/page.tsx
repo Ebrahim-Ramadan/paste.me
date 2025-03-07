@@ -22,6 +22,7 @@ export default function CreatePage() {
   const createPaste = useCreatePaste()
   const signInWithGoogle = useSignInWithGoogle()
   const [isSigningIn, setIsSigningIn] = useState(false)
+  const [creatingLoadingState, setcreatingLoadingState] = useState<Boolean>(false)
 
   // Redirect to home if not signed in
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function CreatePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setcreatingLoadingState(true)
 
     if (!user) {
       toast.error("You must be signed in to create a paste")
@@ -153,10 +155,12 @@ export default function CreatePage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={createPaste.isPending}>
-                <Save className="mr-2 h-4 w-4" />
-                {createPaste.isPending ? "Saving..." : "Save Paste"}
-              </Button>
+              {!creatingLoadingState? <div className="w-full flex justify-center"><LoadingDots/></div> : 
+            <Button type="submit" className="w-full" disabled={createPaste.isPending}>
+            <Save className="mr-2 h-4 w-4" />
+            {createPaste.isPending ? "Saving..." : "Save Paste"}
+          </Button>}
+              
             </CardFooter>
           </form>
         </Card>

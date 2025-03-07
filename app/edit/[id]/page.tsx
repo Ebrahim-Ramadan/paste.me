@@ -55,8 +55,10 @@ export default function EditPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false); // Track image upload status
   const [FaileduploadingImageError, setFailedUploadingImageError] = useState(false); // Track image upload status
-
   const [uploadedImageFilenamesThisSession, setUploadedImageFilenamesThisSession] = useState<string[]>([]); // Track uploaded image filenames in current session
+
+
+  const [updating, setupdating] = useState<Boolean>(false)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -117,7 +119,7 @@ useEffect(() => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setupdating(true);
     if (!user) {
       toast.error("You must be signed in to update a paste");
       return;
@@ -243,6 +245,7 @@ useEffect(() => {
 
       if (error) {
         setFailedUploadingImageError(true)
+        console.log('Supabase upload error:', error);
         throw new Error(`Supabase upload error: ${error.message}`);
       }
 
@@ -440,11 +443,12 @@ useEffect(() => {
                   ref={textareaRef}
                   required
                 />
-                {uploadingImage && <p className=" absolute top-2 right-2 text-sm"><LoadingDots/></p>} {/* Uploading indicator */}
-                {FaileduploadingImageError && <p className="text-red-500">Failed to upload Image</p>} {/* Uploading indicator */}
+                {uploadingImage && <p className=" absolute top-8 right-2"><LoadingDots/></p>} {/* Uploading indicator */}
+                {FaileduploadingImageError && <p className="text-red-500">Failed to upload Image (see console)</p>} {/* Uploading indicator */}
               </div>
             </CardContent>
             <CardFooter>
+              {updating? <div className="flex justify-center w-full"><LoadingDots/></div> :
               <Button
                 type="submit"
                 className="w-full"
@@ -453,6 +457,7 @@ useEffect(() => {
                 <Save className="mr-2 h-4 w-4" />
                 {updatePaste.isPending ? "Saving..." : "Update Paste"}
               </Button>
+              }
             </CardFooter>
           </form>
         </Card>
