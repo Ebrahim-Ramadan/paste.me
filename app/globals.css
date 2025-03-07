@@ -75,3 +75,21 @@
   }
 }
 
+
+/* width */
+::-webkit-scrollbar {
+  height: 0;
+  width: 0;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  height: 0;
+  border-radius: 0;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  height: 0;
+  border-radius: 0;
+}
