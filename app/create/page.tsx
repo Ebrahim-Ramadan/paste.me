@@ -145,10 +145,10 @@ export default function CreatePage() {
   const handleImageDrop = async (e: React.DragEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
     setUploadingImage(true);
-
+  
     const files = Array.from(e.dataTransfer.files);
     const imageFile = files.find((file) => file.type.startsWith("image/"));
-
+  
     if (imageFile) {
       try {
         const imageUrl = await uploadImage(imageFile);
@@ -162,8 +162,23 @@ export default function CreatePage() {
         setUploadingImage(false);
       }
     } else {
+      // Handle text drop if no image file is found
+      const text = e.dataTransfer.getData('text');
+      if (text) {
+        const textArea = textareaRef.current;
+        if (textArea) {
+          const start = textArea.selectionStart;
+          const end = textArea.selectionEnd;
+          const newContent = content.substring(0, start) + text + content.substring(end);
+          setContent(newContent);
+  
+          textArea.focus();
+          textArea.selectionStart = textArea.selectionEnd = start + text.length;
+        }
+      } else {
+        toast.error("No valid image file or text dropped.");
+      }
       setUploadingImage(false);
-      toast.error("No valid image file dropped.");
     }
   };
 
@@ -296,7 +311,7 @@ export default function CreatePage() {
                 </label>
                 <Input
                   id="title"
-                  placeholder="Enter a title for your paste"
+                  placeholder="What is it you're sharing"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
@@ -309,7 +324,7 @@ export default function CreatePage() {
                 </label>
                 <Textarea
                   id="content"
-                  placeholder="# Your markdown content here..."
+                  placeholder="What is your paste"
                   className="min-h-[300px] font-mono"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
@@ -337,16 +352,20 @@ export default function CreatePage() {
                     <Upload className="mr-1" size="16" />
                     Attach files by dragging & dropping, selecting or pasting them.
                   </Button>
+                  <a href="https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax"
+                  target="_blank" className="flex flex-row block select-none align-text-bottom overflow-visible absolute inset-y-0 right-0">
+                  
                   <svg
                     aria-hidden="true"
                     focusable="false"
-                    className="flex flex-row block select-none align-text-bottom overflow-visible absolute inset-y-0 right-0 fill-current text-neutral-400 group-hover:text-neutral-600"
+                    className=" fill-current text-neutral-400 group-hover:text-neutral-600"
                     viewBox="0 0 16 16"
                     width="16"
                     height="16"
                   >
                     <path d="M14.85 3c.63 0 1.15.52 1.14 1.15v7.7c0 .63-.51 1.15-1.15 1.15H1.15C.52 13 0 12.48 0 11.84V4.15C0 3.52.52 3 1.15 3ZM9 11V5H7L5.5 7 4 5H2v6h2V8l1.5 1.92L7 8v3Zm2.99.5L14.5 8H13V5h-2v3H9.5Z"></path>
                   </svg>
+                  </a>
                   <input
                     type="file"
                     ref={fileInputRef}
