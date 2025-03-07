@@ -29,7 +29,7 @@ export const metadata :Metadata= {
     siteName: 'pastedotme',
     images: [
       {
-        url: 'https://avatars.githubusercontent.com/u/65041082?s=400&u=cb58112cd92067eb53afe77fc7beb1573aab869d&v=4',
+        url: 'https://raw.githubusercontent.com/Ebrahim-Ramadan/paste.me/refs/heads/main/public/og%20image.png',
         width: 1200,
         height: 630,
         alt: 'Paste.me',
@@ -40,7 +40,7 @@ export const metadata :Metadata= {
     card: "summary_large_image",
     title: 'Ebrahim Ramadan',
     description: 'Ebrahim Ramadan',
-    images: 'https://avatars.githubusercontent.com/u/65041082?s=400&u=cb58112cd92067eb53afe77fc7beb1573aab869d&v=4',
+    images: 'https://raw.githubusercontent.com/Ebrahim-Ramadan/paste.me/refs/heads/main/public/og%20image.png',
     creator: "@scoopsahoykid",
   },
   icons: {

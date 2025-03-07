@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, LogIn, Upload } from "lucide-react";
+import { ArrowLeft, Save, LogIn, Upload, Code, Link2, Quote, TextQuote } from "lucide-react";
 import Link from "next/link";
 import { useCreatePaste, useUser, useSignInWithGoogle } from "@/lib/hooks";
 import { toast } from "sonner";
@@ -109,9 +109,7 @@ export default function CreatePage() {
       console.error("Error creating paste:", error);
       toast.error("Failed to create paste");
       router.push("/");
-    } finally {
-      setcreatingLoadingState(false);
-    }
+    } 
   };
 
   const handleImagePaste = async (e: React.ClipboardEvent) => {
@@ -291,6 +289,54 @@ export default function CreatePage() {
     );
   }
 
+  const handleInsertCodeBlock = () => {
+    if (!textareaRef.current) return;
+  
+    const textArea = textareaRef.current;
+    const start = textArea.selectionStart;
+    const end = textArea.selectionEnd;
+    const codeBlock = "```\n\n```"; // Triple backticks with a newline in between
+  
+    const newContent =
+      content.substring(0, start) + codeBlock + content.substring(end);
+    setContent(newContent);
+  
+    // Move the cursor inside the code block
+    textArea.focus();
+    textArea.selectionStart = textArea.selectionEnd = start + 4; // Place cursor between the backticks
+  };
+  const handleInsertLink = () => {
+    if (!textareaRef.current) return;
+  
+    const textArea = textareaRef.current;
+    const start = textArea.selectionStart;
+    const end = textArea.selectionEnd;
+    const linkMarkdown = "[](url)"; // Markdown link syntax
+  
+    const newContent =
+      content.substring(0, start) + linkMarkdown + content.substring(end);
+    setContent(newContent);
+  
+    // Move the cursor inside the square brackets
+    textArea.focus();
+    textArea.selectionStart = textArea.selectionEnd = start + 1; // Place cursor inside the brackets
+  };
+  const handleInserQuote = () => {
+    if (!textareaRef.current) return;
+  
+    const textArea = textareaRef.current;
+    const start = textArea.selectionStart;
+    const end = textArea.selectionEnd;
+    const QuoteMarkdown = "> "; // Markdown Quote syntax
+  
+    const newContent =
+      content.substring(0, start) + QuoteMarkdown + content.substring(end);
+    setContent(newContent);
+  
+    // Move the cursor inside the square brackets
+    textArea.focus();
+    textArea.selectionStart = textArea.selectionEnd = start + 1; // Place cursor inside the brackets
+  };
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-3xl mx-auto">
@@ -318,10 +364,33 @@ export default function CreatePage() {
                   autoFocus
                 />
               </div>
-              <div className="space-y-2 relative">
+              <div className=" relative">
+                <div className="w-full flex justify-between flex-col md:flex-row">
                 <label htmlFor="content" className="text-sm font-medium">
                   Content (Markdown supported)
                 </label>
+                <div className="mt-2 mb-1 flex flex-row items-center gap-2 justify-end [&>*]:border-neutral-100 [&>*]:border-2 [&>*]:rounded-lg [&>*]:p-1 hover:[&>*]:bg-neutral-100 [&>*]:cursor-pointer">
+                <div
+                title="Code"
+                  onClick={handleInsertCodeBlock}
+                >
+                  <Code size="16" /> {/* Add the Code icon */}
+                </div>
+                <div
+                title="Link"
+                  onClick={handleInsertLink}
+                >
+                  <Link2 size="16" /> {/* Add the Code icon */}
+                </div>
+                <div
+                title="Qoute"
+                  onClick={handleInserQuote}
+                >
+                  <TextQuote size="16" /> {/* Add the Code icon */}
+                </div>
+                </div>
+                  </div>
+                
                 <Textarea
                   id="content"
                   placeholder="What is your paste"
@@ -342,7 +411,7 @@ export default function CreatePage() {
                 {FaileduploadingImageError && (
                   <p className="text-red-500">Failed to upload Image (see console)</p>
                 )}
-                <div className="group text-sm text-neutral-400 flex items-center relative">
+                <div className="group text-sm text-neutral-400 flex items-center relative mt-2">
                   <Button
                     type="button"
                     variant="link"
