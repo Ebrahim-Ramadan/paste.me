@@ -6,6 +6,8 @@ Welcome to [Paste.me](https://pastedotme.vercel.app/)! 👋
 
 Paste.me is a simple, free, and open-source tool that helps you share any content easily. Think of it as a friendly notepad that lives on the internet!
 
+https://github.com/user-attachments/assets/d6c025b8-295f-40ce-afb2-edaafd3e4db5
+
 ## Tech Stack
 
 - **Frontend**: Next.js fullstack framework
@@ -20,6 +22,8 @@ Paste.me is a simple, free, and open-source tool that helps you share any conten
 - **Open Source**: We believe in community and transparency. Our code is open for anyone to view, use, and improve.
 - **Simple to Use**: No complicated setup or learning curve.
 - **For Everyone**: Whether you're sharing notes, snippets, or ideas, Paste.me is here to help.
+
+https://github.com/user-attachments/assets/a1837f4a-869d-4f53-b7e9-39967cbba8cd
 
 ## Get Involved
 
