@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/lib/supabase";  
 import LoadingDots from "@/components/LoadingDots";
+import { extractImageFilenames } from "@/lib/utils";
 
 export default function EditPage() {
   const router = useRouter();
@@ -54,6 +55,8 @@ export default function EditPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false); // Track image upload status
   const [FaileduploadingImageError, setFailedUploadingImageError] = useState(false); // Track image upload status
+
+  const [uploadedImageFilenamesThisSession, setUploadedImageFilenamesThisSession] = useState<string[]>([]); // Track uploaded image filenames in current session
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -106,7 +109,42 @@ export default function EditPage() {
       return;
     }
 
+    // Extract image filenames from the markdown content
+    const imageFilenamesInContent = extractImageFilenames(content);
     try {
+      const initialImageFilenames = paste?.content ? extractImageFilenames(paste.content) : [];
+
+      // Identify images that were in the initial content but are now gone.
+      const imagesToDeleteFromPrevious = initialImageFilenames.filter(filename => !imageFilenamesInContent.includes(filename));
+
+      //Identify images from current edit that were pasted then removed immediately
+      const imagesToDeleteFromSession = uploadedImageFilenamesThisSession.filter(filename => !imageFilenamesInContent.includes(filename));
+      
+      //Concat array
+      const imagesToDelete = imagesToDeleteFromPrevious.concat(imagesToDeleteFromSession)
+
+      if (imagesToDelete.length > 0) {
+          await Promise.all(
+              imagesToDelete.map(async (filename) => {
+                  try {
+                      const bucketName = process.env.NEXT_PUBLIC_supabase_bucket_name as string;
+                      const { error: deleteError } = await supabase.storage
+                          .from(bucketName)
+                          .remove([filename]);
+                      if (deleteError) {
+                          console.error(`Error deleting image ${filename}:`, deleteError);
+                          toast.error(`Error deleting image ${filename}: ${deleteError.message}`);
+                      } else {
+                          console.log(`Deleted image ${filename} from Supabase Storage`);
+                      }
+                  } catch (deleteError: any) {
+                      console.error(`Error deleting image ${filename}:`, deleteError);
+                      toast.error(`Error deleting image ${filename}: ${deleteError.message}`);
+                  }
+              })
+          );
+      }
+
       const updatedPaste = await updatePaste.mutateAsync({
         id,
         title,
@@ -119,6 +157,10 @@ export default function EditPage() {
       console.error("Error updating paste:", error);
       toast.error("Failed to update paste");
     }
+    finally {
+      // Clear the uploaded images in this session
+      setUploadedImageFilenamesThisSession([]);   
+  }
   };
 
   const handleDelete = async () => {
@@ -184,6 +226,9 @@ export default function EditPage() {
         setFailedUploadingImageError(true)
         throw new Error(`Supabase upload error: ${error.message}`);
       }
+
+      // Update uploaded images array
+      setUploadedImageFilenamesThisSession((prevFilenames) => [...prevFilenames, fileName]);
 
       const { data: publicURL } = supabase.storage
         .from(bucketName)
@@ -355,7 +400,7 @@ export default function EditPage() {
                   ref={textareaRef}
                   required
                 />
-                {uploadingImage && <p className=" absolute bottom-2 right-2 text-sm"><LoadingDots/></p>} {/* Uploading indicator */}
+                {uploadingImage && <p className=" absolute top-2 right-2 text-sm"><LoadingDots/></p>} {/* Uploading indicator */}
                 {FaileduploadingImageError && <p className="text-red-500">Failed to upload Image</p>} {/* Uploading indicator */}
               </div>
             </CardContent>

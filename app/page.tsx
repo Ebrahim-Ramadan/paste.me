@@ -84,7 +84,7 @@ export default function Home() {
                 ) : (
                   <ul className="space-y-2">
                     {userPastes.map((paste) => (
-                      <Link key={paste.id} href={`/paste/${paste.id}`} className="group  border-b pb-2 last:border-0 hover:bg-blue-200">
+                      <a key={paste.id} href={`/paste/${paste.id}`} className="group  border-b pb-2 last:border-0 hover:bg-blue-200">
                         <p  className="block group-hover:underline font-medium">
                           {paste.title}
                         </p>
@@ -92,12 +92,12 @@ export default function Home() {
                           <p className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
                           </p>
-                          <Link href={`/edit/${paste.id}`} className="text-xs text-primary gap-2 hover:underline flex items-center flex-row">
+                          <a href={`/edit/${paste.id}`} className="text-xs text-primary gap-2 hover:underline flex items-center flex-row">
                           <Edit size='16' />
                             Edit
-                          </Link>
+                          </a>
                         </div>
-                      </Link>
+                      </a>
                     ))}
                   </ul>
                 )}
