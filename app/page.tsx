@@ -84,36 +84,47 @@ export default function Home() {
 
           {user && (
             <Card>
-              <CardHeader>
-                <CardTitle>Your Pastes</CardTitle>
+              <CardHeader >
+                <CardTitle >Your Pastes</CardTitle>
                 <CardDescription>Pastes you've created</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-2 p-4 md:p-6">
                 {isLoadingUserPastes ? (
                   <p className="text-muted-foreground">Loading your pastes...</p>
                 ) : userPastes.length === 0 ? (
                   <p className="text-muted-foreground">You haven't created any pastes yet</p>
                 ) : (
                   <Suspense fallback={<LoadingDots />}>
-                    <ul className="space-y-2">
-                    {userPastes.map((paste) => (
-                      <a key={paste.id} href={`/paste/${paste.id}`} className="group  border-b pb-2 last:border-0 hover:bg-blue-200">
-                        <p  className="block group-hover:underline font-medium">
-                          {paste.title}
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <p className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
-                          </p>
-                          <a href={`/edit/${paste.id}`} className="text-xs text-primary gap-2 hover:underline flex items-center flex-row">
-                          <Edit size='16' />
-                            Edit
-                          </a>
-                        </div>
-                      </a>
-                    ))}
-                  </ul>
-                  </Suspense>
+  {userPastes.map((paste) => (
+      <li
+        key={paste.id}
+        className="grid grid-cols-[1fr_auto] border-b pb-2 last:border-0 items-center"
+      >
+        <a
+          href={`/paste/${paste.id}`}
+          className="group hover:bg-neutral-50 p-2 block"
+        >
+          
+          <p className="leading-[1.5] group-hover:underline normal-case font-medium hidden md:block">
+          {paste.title.length > 100 ? `${paste.title.slice(0, 100)}...` : paste.title}
+          </p>
+          <p className="leading-[1.2] group-hover:underline normal-case font-medium block md:hidden">
+          {paste.title.length > 30 ? `${paste.title.slice(0, 30)}...` : paste.title}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
+          </p>
+        </a>
+        <a
+          href={`/edit/${paste.id}`}
+          className="text-xs text-primary gap-2 hover:underline flex items-center flex-row pl-4"
+        >
+          <Edit size="16" />
+          Edit
+        </a>
+      </li>
+    ))}
+</Suspense>
                 )}
               </CardContent>
             </Card>

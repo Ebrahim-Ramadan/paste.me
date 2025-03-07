@@ -14,7 +14,8 @@ import LoadingDots from "@/components/LoadingDots"
 
 export default function PastePage() {
   const params = useParams()
-  const [copied, setCopied] = useState(false)
+  const [contentcopied, setcontentCopied] = useState(false)
+  const [linkcopied, setlinkCopied] = useState(false)
   const [isSigningIn, setIsSigningIn] = useState(false)
 
   const slugParam = params?.slug as string
@@ -26,12 +27,21 @@ export default function PastePage() {
 
   const isCreator = user?.id && paste?.user_id === user.id
 
-  const copyToClipboard = () => {
+  const copyToClipboard = (type: "link" | "content") => () => {
     if (typeof window !== "undefined") {
-      navigator.clipboard.writeText(window.location.href)
-      setCopied(true)
-      toast.success("Link copied to clipboard")
-      setTimeout(() => setCopied(false), 2000)
+      if (type === "link") {
+        navigator.clipboard.writeText(window.location.href)
+        setlinkCopied(true)
+      setTimeout(() => setlinkCopied(false), 2000)
+
+      }
+      else {
+        // @ts-ignore
+        navigator.clipboard.writeText(paste.content)
+        setcontentCopied(true)
+        setTimeout(() => setcontentCopied(false), 2000)
+      }
+      toast.success(`${type} copied to clipboard`)
     }
   }
 
@@ -107,11 +117,17 @@ export default function PastePage() {
               <Markdown content={paste.content} />
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={copyToClipboard}>
+          <CardFooter className="flex justify-between md:flex-row flex-col gap-2">
+            <div className="flex md:flex-row flex-col gap-2">
+            <Button variant="outline" onClick={copyToClipboard('link')} disabled={isLoading}>
               <Copy className="mr-2 h-4 w-4" />
-              {copied ? "Copied!" : "Copy link"}
+              {linkcopied ? "Copied!" : "Copy link"}
             </Button>
+            <Button variant="outline" onClick={copyToClipboard('content')}>
+              <Copy className="mr-2 h-4 w-4" />
+              {contentcopied ? "Copied!" : "Copy Content"}
+            </Button>
+            </div>
             <Button variant="outline" asChild>
               <a href={`/raw/${paste.id}`} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 h-4 w-4" />
