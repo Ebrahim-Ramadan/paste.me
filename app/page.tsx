@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {  Plus, LogIn, Edit, Delete, Trash, Trash2 } from "lucide-react"
+import {  Plus, LogIn, Edit, Trash2 } from "lucide-react"
 import {  useUser, useUserPastes, useSignInWithGoogle, useDeletePaste } from "@/lib/hooks"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
@@ -13,7 +13,6 @@ import LoadingDots from "@/components/LoadingDots"
 
 export default function Home() {
   const { data: user, isLoading: isLoadingUser } = useUser()
-  // const { data: recentPastes = [], isLoading: isLoadingRecent } = useRecentPastes()
   const { data: userPastes = [], isLoading: isLoadingUserPastes } = useUserPastes(user?.id)
   const signInWithGoogle = useSignInWithGoogle()
     const deletePaste = useDeletePaste();
