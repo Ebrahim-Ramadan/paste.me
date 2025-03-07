@@ -155,7 +155,7 @@ export default function CreatePage() {
               </div>
             </CardContent>
             <CardFooter>
-              {!creatingLoadingState? <div className="w-full flex justify-center"><LoadingDots/></div> : 
+              {creatingLoadingState? <div className="w-full flex justify-center"><LoadingDots/></div> : 
             <Button type="submit" className="w-full" disabled={createPaste.isPending}>
             <Save className="mr-2 h-4 w-4" />
             {createPaste.isPending ? "Saving..." : "Save Paste"}
