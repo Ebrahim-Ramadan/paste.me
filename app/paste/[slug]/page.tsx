@@ -1,7 +1,6 @@
-// PastePage.tsx (alternative approach with memoization)
 "use client";
 
-import React, { lazy, Suspense, useState, memo } from "react";
+import React, { lazy, Suspense, useState, memo, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -12,76 +11,120 @@ import { usePaste, useUser, useSignInWithGoogle } from "@/lib/hooks";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import LoadingDots from "@/components/LoadingDots";
+import dynamic from "next/dynamic";
+interface ShareModalProps {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  content: string;
+  url: string;
+}
+const ShareModal = dynamic<ShareModalProps>(() => import("@/components/ShareModal"), {
+  ssr: true, // Enable SSR
+  suspense: true, // Use Suspense (Next.js 13+ recommended approach)
+});
 
-const ShareModal = lazy(() => import("@/components/ShareModal"));
 
-// Memoized components to prevent re-renders
-// @ts-ignore
-const MemoizedCardHeader = memo(function CardHeaderSection({ paste, isCreator, user, isSigningIn, handleSignIn }) {
-  return (
-    <CardHeader className="flex flex-row items-start justify-between">
-      <div>
-        <CardTitle className="leading-7">
-          {paste.title.length > 80 ? `${paste.title.slice(0, 80)}...` : paste.title}
-        </CardTitle>
-        <CardDescription className="text-neutral-600">
-          created {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
-        </CardDescription>
-      </div>
-      {isCreator ? (
-        <a href={`/edit/${paste.id}`}>
-          <Button variant="outline" size="sm">
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
+// Type definitions
+interface Paste {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+}
+
+interface User {
+  id: string;
+}
+
+interface CardHeaderProps {
+  paste: Paste;
+  isCreator: boolean;
+  user: User | null;
+  isSigningIn: boolean;
+  handleSignIn: () => void;
+}
+
+interface CardContentProps {
+  content: string;
+}
+
+// Memoized components
+const MemoizedCardHeader = memo<CardHeaderProps>(
+  function CardHeaderSection({ paste, isCreator, user, isSigningIn, handleSignIn }) {
+    return (
+      <CardHeader className="flex flex-row items-start justify-between">
+        <div>
+          <CardTitle className="leading-7">
+            {paste.title.length > 80 ? `${paste.title.slice(0, 80)}...` : paste.title}
+          </CardTitle>
+          <CardDescription className="text-neutral-600">
+            created {formatDistanceToNow(new Date(paste.created_at), { addSuffix: true })}
+          </CardDescription>
+        </div>
+        {isCreator ? (
+          <a href={`/edit/${paste.id}`}>
+            <Button variant="outline" size="sm">
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+          </a>
+        ) : user ? null : (
+          <Button variant="outline" size="sm" onClick={handleSignIn} disabled={isSigningIn}>
+            <LogIn className="h-4 w-4 mr-2" />
+            Sign in
           </Button>
-        </a>
-      ) : user ? null : (
-        <Button variant="outline" size="sm" onClick={handleSignIn} disabled={isSigningIn}>
-          <LogIn className="h-4 w-4 mr-2" />
-          Sign in
-        </Button>
-      )}
-    </CardHeader>
-  );
-// @ts-ignore
-}, (prevProps, nextProps) => prevProps.paste.id === nextProps.paste.id && prevProps.isCreator === nextProps.isCreator && prevProps.isSigningIn === nextProps.isSigningIn);
-// @ts-ignore
-const MemoizedCardContent = memo(function CardContentSection({ content }) {
-  return (
-    <CardContent>
-      <div className="prose prose-sm sm:prose max-w-none dark:prose-invert">
-        <Markdown content={content} />
-      </div>
-    </CardContent>
-  );
-// @ts-ignore
-}, (prevProps, nextProps) => prevProps.content === nextProps.content);
+        )}
+      </CardHeader>
+    );
+  },
+  (prevProps, nextProps) => 
+    prevProps.paste.id === nextProps.paste.id && 
+    prevProps.isCreator === nextProps.isCreator && 
+    prevProps.isSigningIn === nextProps.isSigningIn
+);
+
+const MemoizedCardContent = memo<CardContentProps>(
+  function CardContentSection({ content }) {
+    return (
+      <CardContent>
+        <div className="prose prose-sm sm:prose max-w-none dark:prose-invert">
+          <Markdown content={content} />
+        </div>
+      </CardContent>
+    );
+  },
+  (prevProps, nextProps) => prevProps.content === nextProps.content
+);
 
 export default function PastePage() {
-  const params = useParams();
+  const params = useParams<{ slug: string }>();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   
-  const slugParam = params?.slug as string;
-  const id = slugParam?.split("-")[0];
+  const slugParam = params?.slug;
+  const id = slugParam?.split("-")[0] ?? "";
 
   const { data: paste, isLoading, error } = usePaste(id);
   const { data: user } = useUser();
   const signInWithGoogle = useSignInWithGoogle();
 
-  const isCreator = user?.id && paste?.user_id === user.id;
+  const isCreator = !!(user?.id && paste?.user_id === user.id);
 
-  const handleSignIn = async () => {
+  const handleSignIn = useCallback(async () => {
     if (isSigningIn) return;
     setIsSigningIn(true);
     try {
+      console.time('signInWithGoogle');
       await signInWithGoogle.mutateAsync();
-    } catch (error: any) {
+      console.timeEnd('signInWithGoogle');
+    } catch (error: unknown) {
       console.error("Error signing in:", error);
-      toast.error(error.message || "Failed to sign in with Google");
+      toast.error(error instanceof Error ? error.message : "Failed to sign in");
+    } finally {
       setIsSigningIn(false);
     }
-  };
+  }, [isSigningIn, signInWithGoogle]);
 
   if (isLoading) {
     return (
@@ -118,11 +161,14 @@ export default function PastePage() {
         </Link>
 
         <Card>
-{/* @ts-ignore */}
-          <MemoizedCardHeader paste={paste} isCreator={isCreator} user={user} isSigningIn={isSigningIn} handleSignIn={handleSignIn} />
-    
-{/* @ts-ignore */}
-<MemoizedCardContent content={paste.content} />
+          <MemoizedCardHeader 
+            paste={paste} 
+            isCreator={isCreator} 
+            user={user ?? null} 
+            isSigningIn={isSigningIn} 
+            handleSignIn={handleSignIn} 
+          />
+          <MemoizedCardContent content={paste.content} />
           <CardFooter className="flex justify-between md:flex-row flex-col gap-2">
             <div className="flex md:flex-row flex-col gap-2">
               <Button 
