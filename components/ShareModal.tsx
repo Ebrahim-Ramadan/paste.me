@@ -52,6 +52,15 @@ export function ShareModal({ isOpen, setIsOpen, content, url }: ShareModalProps)
           <AlertDialogTitle>Share this paste</AlertDialogTitle>
         </AlertDialogHeader>
         <div className="space-y-4 py-4">
+        <Suspense fallback={<LoadingDots />}>
+            <QRCodeGenerator
+              value={url}
+              size={200}
+              bgColor="#ffffff"
+              fgColor="#000000"
+              className="mx-auto"
+            />
+          </Suspense>
           <Button 
             variant="outline" 
             className="w-full" 
@@ -69,15 +78,7 @@ export function ShareModal({ isOpen, setIsOpen, content, url }: ShareModalProps)
             <Copy className="mr-2 h-4 w-4" />
             {contentCopied ? "Content Copied!" : "Copy Content"}
           </Button>
-          <Suspense fallback={<LoadingDots />}>
-            <QRCodeGenerator
-              value={url}
-              size={200}
-              bgColor="#ffffff"
-              fgColor="#000000"
-              className="mx-auto"
-            />
-          </Suspense>
+         
         </div>
         <AlertDialogFooter>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
