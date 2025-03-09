@@ -24,7 +24,7 @@ export default async function Page({ params }:PageProps) {
         <LoadingDots />
       </div>
   }>
-
+{/* @ts-ignore */}
       <Pastes paste={paste} />
     </Suspense>
   )
