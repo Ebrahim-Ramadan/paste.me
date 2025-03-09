@@ -15,6 +15,7 @@ export default async function Image() {
           justifyContent: 'center',
         }}
       >
+        {/* @ts-ignore */}
         <img src={logoSrc} height="100" />
       </div>
     )
