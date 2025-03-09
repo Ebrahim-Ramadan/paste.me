@@ -8,7 +8,7 @@ type Props = LayoutProps
 
 export const metadata :Metadata= {
   description: "Create and share text content with Markdown support",
-  title: 'Paste.Me - Free Markdown Sharing',
+  title: 'My Paste',
   keywords: [
     "Ebrahim Ramadan",
     "Paste.Me",
@@ -21,8 +21,8 @@ export const metadata :Metadata= {
     type: "website",
     locale: "en_US",
     url: 'https://pastedotme.vercel.app/',
-    title: 'Paste.Me - Free Markdown Sharing',
-    description: 'Paste.Me - Free Markdown Sharing',
+    title: 'My Paste',
+    description: 'My Paste',
     siteName: 'pastedotme',
     images: [
       {
