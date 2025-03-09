@@ -93,3 +93,9 @@
   height: 0;
   border-radius: 0;
 }
+
+
+.smooth-height-transition {
+  transition: height 0.3s ease-in-out;
+  overflow: hidden;
+}
