@@ -3,17 +3,21 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {  Plus, LogIn, Edit, Trash2 } from "lucide-react"
+import {  Plus, LogIn, Edit, Trash2, ArrowBigRight, ArrowBigLeft, ArrowBigLeftDash, ArrowBigDown, ArrowDownAZ, ArrowDownCircleIcon, ArrowRightCircleIcon, ArrowLeftCircleIcon } from "lucide-react"
 import {  useUser, useUserPastes, useSignInWithGoogle, useDeletePaste } from "@/lib/hooks"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
 import { Suspense, useState } from "react"
 import Image from "next/image"
 import LoadingDots from "@/components/LoadingDots"
+import { CardFooter } from "@/components/card"
 
 export default function Home() {
   const { data: user, isLoading: isLoadingUser } = useUser()
-  const { data: userPastes = [], isLoading: isLoadingUserPastes } = useUserPastes(user?.id)
+
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const pageSize = 5 // Number of pastes per page
+  const { data: userPastes = [], isLoading: isLoadingUserPastes } = useUserPastes(user?.id, currentPage, pageSize)
   const signInWithGoogle = useSignInWithGoogle()
     const deletePaste = useDeletePaste();
   
@@ -47,6 +51,9 @@ export default function Home() {
         toast.error("Failed to delete paste");
       }
     };
+
+
+    const totalPages = Math.ceil((userPastes.count || 0) / pageSize)
 
   return (
     <div className=" mx-auto px-4 py-12"
@@ -105,14 +112,14 @@ export default function Home() {
                 <CardTitle >Your Pastes</CardTitle>
                 <CardDescription>Pastes you've created</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2 p-4 md:p-6">
+              <CardContent className="space-y-2 p-4">
                 {isLoadingUserPastes ? (
                   <p className="text-muted-foreground">Loading your pastes...</p>
-                ) : userPastes.length === 0 ? (
+                ) : userPastes.data.length === 0 ? (
                   <p className="text-muted-foreground">You haven't created any pastes yet</p>
                 ) : (
                   <Suspense fallback={<LoadingDots />}>
-  {userPastes.map((paste) => (
+  {userPastes.data.map((paste) => (
       <li
         key={paste.id}
         className="grid grid-cols-[1fr_auto] border-b pb-2 last:border-0 items-center"
@@ -148,8 +155,33 @@ export default function Home() {
       </li>
     ))}
 </Suspense>
+
                 )}
               </CardContent>
+
+                {/* Pagination Controls */}
+              <CardFooter>
+              <div className="flex w-full justify-center gap-4 mt-4 [&>*]:p-2 [&>*]:rounded-full">
+                  <button
+                  className={ currentPage === 1 ? "text-neutral-400" : "text-neutral-900 hover:bg-neutral-100"}
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ArrowLeftCircleIcon />
+                  </button>
+
+                  <span className="flex items-center text-sm text-muted-foreground">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                  className={ currentPage === totalPages ? "text-neutral-400" : "text-neutral-900 hover:bg-neutral-100"}
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ArrowRightCircleIcon />
+                  </button>
+                </div>
+              </CardFooter>
             </Card>
           )}
         </div>

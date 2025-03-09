@@ -58,28 +58,29 @@ export function useRecentPastes() {
   })
 }
 
-// Get user's pastes
-export function useUserPastes(userId: string | undefined) {
+// Get user's pastes hook
+export function useUserPastes(userId: string, page: number, pageSize: number) {
   return useQuery({
-    queryKey: ["pastes", "user", userId],
+    queryKey: ["userPastes", userId, page, pageSize],
     queryFn: async () => {
-      if (!userId) return []
-      const { data, error } = await supabase
+      const offset = (page - 1) * pageSize;
+console.log('fetching');
+
+      const { data, error, count } = await supabase
         .from("pastes")
-        .select("id, title, created_at")
-        .eq("user_id", userId)
+        .select("id, title, created_at", { count: 'exact' })
+        .eq("user_id", userId) // Assuming the column is `user_id`
         .order("created_at", { ascending: false })
-        .limit(5)
+        .range(offset, offset + pageSize - 1);
 
       if (error) {
-        console.error("Error fetching user pastes:", error)
-        return []
+        console.error("Error fetching user pastes:", error);
+        return { data: [], count: 0 };
       }
 
-      return data as Paste[]
+      return { data: data as Paste[], count: count || 0 };
     },
-    enabled: !!userId,
-  })
+  });
 }
 
 // Create a new paste

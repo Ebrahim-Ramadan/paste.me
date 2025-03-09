@@ -2,19 +2,20 @@ import { supabase } from '@/lib/supabase'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-type Props = {
+type LayoutProps  = {
   params: { slug: string }
   children: React.ReactNode
 }
+type Props = LayoutProps
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slugParam = params?.slug
-  const id = slugParam?.split("-")[0]
+  const {slug} = await params
+  console.log('slug', slug);
 
   const { data: paste, error } = await supabase
     .from("pastes")
     .select("title, created_at")
-    .eq("id", id)
+    .eq("id", slug)
     .single()
 
   if (error) {
@@ -29,12 +30,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const baseUrl = process.env.BASE_URL || 'https://pastedotme.vercel.app'
   const title = paste.title || 'New Paste'
   const description = paste.title || 'A paste created with our service'
-  const url = `${baseUrl}/paste/${slugParam}`
+  const url = `${baseUrl}/paste/${slug}`
   const created = paste.created_at
     ? new Date(paste.created_at).toLocaleDateString()
     : 'Unknown Date'
   
-  const ogImageUrl = `${baseUrl}/paste/${slugParam}/og?title=${encodeURIComponent(title)}&created=${encodeURIComponent(created)}`
+  const ogImageUrl = `${baseUrl}/paste/${slug}/og?title=${encodeURIComponent(title)}&created=${encodeURIComponent(created)}`
 
   return {
     metadataBase: new URL(baseUrl), // Set the base URL for resolving relative URLs
