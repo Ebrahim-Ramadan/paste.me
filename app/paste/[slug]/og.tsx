@@ -1,6 +1,4 @@
 import { ImageResponse } from 'next/og'
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 
 // Image metadata
 export const alt = 'Paste OG Image'
@@ -18,7 +16,7 @@ export default async function OgImage({
   params: { slug: string; title?: string; created?: string }
 }) {
   // Extract query parameters from the URL
-  const url = new URL(`https://pastedotme.vercel.app/paste/${params.slug}/og${params.title ? `?title=${params.title}` : ''}${params.created ? `&created=${params.created}` : ''}`, 'https://example.com');
+  const url = new URL(`https://pastedotme.vercel.app/paste/${params.slug}/og${params.title ? `?title=${params.title}` : ''}${params.created ? `&created=${params.created}` : ''}`, 'https://pastedotme.vercel.app');
   const title = url.searchParams.get('title') || 'New Paste'
   const created = url.searchParams.get('created') || 'Earlier Today'
 
