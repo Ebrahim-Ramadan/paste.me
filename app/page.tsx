@@ -17,7 +17,8 @@ export default function Home() {
 
   const [currentPage, setCurrentPage] = useState<number>(1)
   const pageSize = 5 // Number of pastes per page
-  const { data: userPastes = [], isLoading: isLoadingUserPastes } = useUserPastes(user?.id, currentPage, pageSize)
+  // @ts-ignore
+  const { data: userPastes =  { data: [], count: 0 }, isLoading: isLoadingUserPastes } = useUserPastes(user?.id, currentPage, pageSize)
   const signInWithGoogle = useSignInWithGoogle()
     const deletePaste = useDeletePaste();
   

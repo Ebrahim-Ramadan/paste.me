@@ -26,7 +26,6 @@ export  function Pastes({
 
       <p className='text-neutral-600 text-xs mb-4'>Created at: {new Date(pasteInfo.data.created_at).toLocaleString()}</p>
           <Markdown content={pasteInfo.data.content} />
-{/* <iframe src={`https://localhost:3000/embed/${pasteInfo.data.id}`} width="600" height="400" style={{border:"1px solid #ccc"}}></iframe> */}
   </div>
   )
 }
