@@ -58,7 +58,7 @@ export function UserMenu() {
 </svg>
 Github
 </a>
-      <Button onClick={handleSignIn} disabled={isSigningIn} size="sm ">
+      <Button onClick={handleSignIn} disabled={isSigningIn} size="sm">
        
         <LogIn className="mr-2 h-4 w-4" />
         {isSigningIn ? "Signing in..." : "Sign in"}
