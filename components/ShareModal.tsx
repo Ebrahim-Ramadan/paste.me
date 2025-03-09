@@ -28,6 +28,7 @@ interface ShareModalProps {
 export function ShareModal({ isOpen, setIsOpen, content, url }: ShareModalProps) {
   const [contentCopied, setContentCopied] = React.useState(false);
   const [linkCopied, setLinkCopied] = React.useState(false);
+  const [iframeCodeCopied, setiframeCodeCopied] = React.useState(false);
 
   const copyToClipboard = (type: "link" | "content" | "iframe") => () => {
     if (type === "link") {
@@ -38,7 +39,11 @@ export function ShareModal({ isOpen, setIsOpen, content, url }: ShareModalProps)
       navigator.clipboard.writeText(content!);
       setContentCopied(true);
       setTimeout(() => setContentCopied(false), 2000);
-    } 
+    } else  if (type === "iframe") {
+      navigator.clipboard.writeText(`<iframe src="https://pastedotme.vercel.app/embed/${url.split('/embed/')[1]}" width="600" height="400" style="border: 1px solid #ccc;"></iframe>`);
+      setiframeCodeCopied(true);
+      setTimeout(() => setiframeCodeCopied(false), 2000);
+    }
     toast.success(`${type} copied to clipboard`);
   };
 
@@ -60,7 +65,7 @@ export function ShareModal({ isOpen, setIsOpen, content, url }: ShareModalProps)
               className="mx-auto"
             />
           </Suspense>
-          <Button
+          <Button 
             variant="outline" 
             className="w-full" 
             onClick={copyToClipboard("link")}
@@ -85,6 +90,18 @@ export function ShareModal({ isOpen, setIsOpen, content, url }: ShareModalProps)
           }
             {contentCopied ? "Content Copied!" : "Copy Content"}
           </Button>
+          <Button 
+          onClick={copyToClipboard("iframe")}
+          variant="outline" 
+            className="w-full" >
+               {iframeCodeCopied?
+          <CheckCheck className="mr-2 h-4 w-4" />
+          :
+          <Copy className="mr-2 h-4 w-4" />
+          }
+          {iframeCodeCopied ? "iFrame Copied!" : "Copy iFrame Code"}
+
+      </Button>
         </div>
         <AlertDialogFooter>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
